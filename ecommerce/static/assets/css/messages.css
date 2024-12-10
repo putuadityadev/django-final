@@ -1,0 +1,28 @@
+.messages-overlay {
+  position: fixed;
+  top: 100px;
+  left: 0;
+  width: 100%;
+  z-index: 9999;
+  pointer-events: none;
+}
+
+.messages-overlay .alert {
+  width: 100%;
+  max-width: 200px;
+  margin: 0 auto;
+  text-align: center;
+  pointer-events: auto;
+  animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+  from {
+      opacity: 0;
+      transform: translateY(-50px);
+  }
+  to {
+      opacity: 1;
+      transform: translateY(0);
+  }
+}

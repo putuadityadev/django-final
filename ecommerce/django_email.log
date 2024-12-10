@@ -1,0 +1,5 @@
+INFO 2024-12-02 15:35:34,178 basehttp "GET /auth/signup/ HTTP/1.1" 200 5289
+INFO 2024-12-02 15:35:40,038 views Attempting to send activation email to adityamph1@gmail.com
+INFO 2024-12-02 15:35:44,495 views Activation email sent successfully to adityamph1@gmail.com
+INFO 2024-12-02 15:35:44,496 basehttp "POST /auth/signup/ HTTP/1.1" 302 0
+INFO 2024-12-02 15:35:44,506 basehttp "GET /auth/login/ HTTP/1.1" 200 5357
