@@ -2,13 +2,14 @@ from django.db import models
 
 # Create your models here.
 class Contact(models.Model):
-  name = models.CharField(max_length=50)
-  email = models.EmailField()
-  desc = models.TextField(max_length=500)
-  phone_number = models.IntegerField()
-  
-  def __str__(self):
-    return self.name
+    name = models.CharField(max_length=50)
+    email = models.EmailField()
+    desc = models.TextField(max_length=500)
+    phone_number = models.CharField(max_length=15)  # Gunakan CharField untuk nomor telepon
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    
+    def __str__(self):
+        return self.name
   
 
 class Product(models.Model):
@@ -17,7 +18,7 @@ class Product(models.Model):
   category = models.CharField(max_length=50, default="")
   subcategory = models.CharField(max_length=50, default="")
   price = models.IntegerField(default=0)
-  desc = models.CharField(max_length=300)
+  desc = models.CharField(max_length=10000)
   
   image = models.ImageField(upload_to='images/images')
   

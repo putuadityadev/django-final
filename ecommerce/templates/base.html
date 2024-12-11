@@ -33,9 +33,16 @@
   <!-- Main CSS File -->
   <link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
   <link href="{% static 'assets/css/messages.css' %}" rel="stylesheet">
-
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=local_mall" />
   <style>
-    
+    .navmenu a.active {
+      font-weight: bold;
+      border-bottom: 2px solid #DC3545;
+  }
+  
+  .navmenu .dropdown a.active {
+      border-bottom: none;  /* Hilangkan border untuk dropdown */
+  }
   </style>
 </head>
 
@@ -47,40 +54,42 @@
       <a href="index.html" class="logo d-flex align-items-center">
         <h1 class="sitename">D-SHOP</h1>
       </a>
-
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="/" class="active">Home</a></li>
-          <li><a href="/product">Product</a></li>
-          <li><a href="/blog">Blog</a></li>
-          <li><a href="/profile">My Profile</a></li>
-          
-          <button type="button" class="nav-link scrollto bg-danger p-3 m-2 text-white"
-          id="popcart" data-container="body" data-toggle="popover" data-placement="bottom"
-          data-html="true">
-          Cart (<span id="cart">0</span>)
-          </button>
-
-
-
-          {% if request.user.is_authenticated %}
-            <li><a href="/auth/logout">Logout</a></li>
-          {% else %}
-            <li class="dropdown"><a href="#"><span>SignIn</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-              <ul>
-                <li><a href="/auth/signup">Sign Up</a></li>
-                <li><a href="/auth/login">Login</a></li>
-              </ul>
-            </li>
-          {% endif %}
-        
-
-
-
-          <li><a href="/contact">Contact</a></li>
+            <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
+            <li><a href="/product" class="{% if request.path == '/product/' %}active{% endif %}">Product</a></li>
+            <li><a href="/blog" class="{% if request.path == '/blog/' %}active{% endif %}">Blog</a></li>
+            <li><a href="/contact" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a></li>
+            <li><a href="/profile" class="{% if request.path == '/profile/' %}active{% endif %}">My Profile</a></li>
+            
+            {% if request.user.is_authenticated %}
+                <li><a href="/auth/logout" class="{% if request.path == '/auth/logout' %}active{% endif %}">Logout</a></li>
+            {% else %}
+                <li class="dropdown">
+                    <a href="#" class="{% if request.path == '/auth/signup' or request.path == '/auth/login' %}active{% endif %}">
+                        <span>SignIn</span> 
+                        <i class="bi bi-chevron-down toggle-dropdown"></i>
+                    </a>
+                    <ul>
+                        <li><a href="/auth/signup" class="{% if request.path == '/auth/signup' %}active{% endif %}">Sign Up</a></li>
+                        <li><a href="/auth/login" class="{% if request.path == '/auth/login' %}active{% endif %}">Login</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+            
+            <button type="button" 
+                    class="nav-link scrollto bg-danger p-3 m-2 text-white d-flex align-items-center justify-content-center"
+                    id="popcart" 
+                    data-container="body" 
+                    data-toggle="popover" 
+                    data-placement="bottom"
+                    data-html="true">
+                <span class="material-symbols-outlined">local_mall</span> 
+                <span id="cart">0</span>
+            </button>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
-      </nav>
+    </nav>
 
     </div>
   </header>

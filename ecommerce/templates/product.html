@@ -5,38 +5,84 @@
 
 {% block body %}
 
-<section id="portfolio" class="portfolio section">
+<section id="portfolio" class="portfolio section mt-5">
     <div class="container-fluid mt-4">
         <div class="row">
             <!-- Sidebar Filter -->
             <div class="col-md-3">
-                <div class="filter-section sticky-top" style="background-color: #f8f9fa; padding: 20px; border-radius: 10px;">
-                    <h4>Filter Products</h4>
+                <div class="filter-section sticky-top" style="
+                    background-color: #ffffff; 
+                    padding: 20px; 
+                    border-radius: 15px;
+                    top: 120px;
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    border: 1px solid #e0e0e0;
+                ">
+                    <h4 class="mb-4 text-dark" style="font-weight: 600;">Filter Products</h4>
                     <form method="get" id="product-filter-form">
                         <div class="mb-3">
-                            <input type="text" 
-                                  name="search" 
-                                  class="form-control" 
-                                  placeholder="Search products..." 
-                                  value="{{ search_query }}">
+                            <div class="input-group">
+                                <input type="text" 
+                                    name="search" 
+                                    class="form-control" 
+                                    placeholder="Search products..." 
+                                    value="{{ search_query }}"
+                                    style="
+                                        border-radius: 10px 0 0 10px;
+                                        focus-border-color: #DC3545;
+                                        focus-box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+                                    ">
+                                <button id="search-button" type="submit" class="btn btn-danger" style="
+                                    border-radius: 0 10px 10px 0;
+                                    background-color: #DC3545;
+                                ">
+                                    <i class="bi bi-search"></i>
+                                </button>
+                            </div>
                         </div>
-
+            
                         <div class="mb-3">
-                            <label>Categories</label>
-                            <select name="category" class="form-control" onchange="this.form.submit()">
+                            <label class="form-label text-dark">Categories</label>
+                            <select name="category" class="form-select custom-select" onchange="this.form.submit()" style="
+                                border-radius: 10px;
+                                color: #495057;
+                            ">
                                 <option value="">All Categories</option>
                                 {% for category in categories %}
-                                    <option value="{{ category }}" 
+                                    <option value="{{ category }}"
                                         {% if category == selected_category %}selected{% endif %}>
                                         {{ category }}
                                     </option>
                                 {% endfor %}
                             </select>
                         </div>
-
+            
                         <div class="mb-3">
-                            <label>Sort By</label>
-                            <select name="sort" class="form-control" onchange="this.form.submit()">
+                            <label class="form-label text-dark">Price Range</label>
+                            <div class="input-group">
+                                <input type="number" 
+                                    name="min_price" 
+                                    placeholder="Min" 
+                                    class="form-control" 
+                                    style="
+                                        border-radius: 10px 0 0 10px;
+                                    ">
+                                <input type="number" 
+                                    name="max_price" 
+                                    placeholder="Max" 
+                                    class="form-control" 
+                                    style="
+                                        border-radius: 0 10px 10px 0;
+                                    ">
+                            </div>
+                        </div>
+            
+                        <div class="mb-3">
+                            <label class="form-label text-dark">Sort By</label>
+                            <select name="sort" class="form-select custom-select" onchange="this.form.submit()" style="
+                                border-radius: 10px;
+                                color: #495057;
+                            ">
                                 <option value="">Default Sorting</option>
                                 <option value="price_asc" {% if sort_by == 'price_asc' %}selected{% endif %}>
                                     Price: Low to High
@@ -47,12 +93,48 @@
                                 <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>
                                     Newest Arrivals
                                 </option>
+                                <option value="rating" {% if sort_by == 'rating' %}selected{% endif %}>
+                                    Top Rated
+                                </option>
                             </select>
                         </div>
+            
+                        <div class="mb-3">
+                            <label class="form-label text-dark">Availability</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="in_stock" id="inStockCheck" 
+                                    style="
+                                        border-color: #DC3545;
+                                        accent-color: #DC3545;
+                                    ">
+                                <label class="form-check-label" for="inStockCheck">
+                                    In Stock Only
+                                </label>
+                            </div>
+                        </div>
+            
+                        <button type="submit" class="btn btn-danger w-100" style="
+                            border-radius: 10px;
+                            background-color: #DC3545;
+                            border-color: #DC3545;
+                        ">
+                            Apply Filters
+                        </button>
                     </form>
                 </div>
             </div>
-
+            
+            <style>
+                .form-control:focus, .form-select:focus {
+                    border-color: #DC3545;
+                    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25) !important;
+                }
+            
+                .form-check-input:checked {
+                    background-color: #DC3545;
+                    border-color: #DC3545;
+                }
+            </style>
             <!-- Product Grid -->
             <div class="col-md-9">
                 {% for product, range, nSlides in allProds %}
@@ -90,9 +172,9 @@
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
 <script>
-     // Find out the cart from local storage
-    if (localStorage.getItem('cart') == null) {
-    var cart = {};
+// Find out the cart from local storage
+if (localStorage.getItem('cart') == null) {
+var cart = {};
 } else {
     var cart = JSON.parse(localStorage.getItem('cart'));
     updateCart(cart);
@@ -107,7 +189,11 @@ $('.divpr').on('click', 'button.cart', function() {
         qty = 1;
         name = document.getElementById('namepr' + idstr.slice(2)).innerHTML;
         price = document.getElementById('pricepr' + idstr.slice(2)).innerHTML;
-        cart[idstr] = [qty, name, price];
+        
+        // Tambahkan URL gambar
+        var imageUrl = document.querySelector(`#pr${idstr.slice(2)}`).closest('.card').querySelector('.card-img-top').src;
+        
+        cart[idstr] = [qty, name, price, imageUrl];
     }
     updateCart(cart);
     localStorage.setItem('cart', JSON.stringify(cart));
@@ -147,11 +233,9 @@ function updatePopover(cart) {
             </div> 
         `;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('clearCartBtn').addEventListener('click', function(e) {
-                e.preventDefault();
-                clearCart();
-            });
+        $(document).on('click', '#clearCartBtn', function(e) {
+            e.preventDefault();
+            clearCart();
         });
     }
 

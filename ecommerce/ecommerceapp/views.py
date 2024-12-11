@@ -9,7 +9,6 @@ from django.views.generic import (
 from django.urls import reverse_lazy
 from django.db.models import Q
 from math import ceil
-
 from ecommerceapp.models import Contact, Product, OrderUpdate, Orders
 
 
@@ -40,7 +39,12 @@ class ContactView(CreateView):
     success_url = reverse_lazy('contact')
 
     def form_valid(self, form):
-        messages.info(self.request, 'We will get back to you soon...')
+        # Simpan form dan dapatkan objek
+        self.object = form.save()
+        
+        # Tambahkan pesan
+        messages.success(self.request, 'We will get back to you soon...')
+        
         return super().form_valid(form)
 
 class ProductView(TemplateView):
@@ -49,10 +53,12 @@ class ProductView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Ambil parameter search dan kategori dari request
+        # Ambil parameter dari request
         search_query = self.request.GET.get('search', '')
         category_filter = self.request.GET.get('category', '')
         sort_by = self.request.GET.get('sort', '')
+        min_price = self.request.GET.get('min_price', '')
+        max_price = self.request.GET.get('max_price', '')
 
         # Query dasar produk
         products = Product.objects.all()
@@ -67,6 +73,28 @@ class ProductView(TemplateView):
         # Filtering berdasarkan kategori
         if category_filter:
             products = products.filter(category=category_filter)
+
+        # Filtering berdasarkan harga
+        if min_price and max_price:
+            try:
+                min_price = float(min_price)
+                max_price = float(max_price)
+                products = products.filter(price__range=(min_price, max_price))
+            except ValueError:
+                # Jika konversi ke float gagal, abaikan filter harga
+                pass
+        elif min_price:
+            try:
+                min_price = float(min_price)
+                products = products.filter(price__gte=min_price)
+            except ValueError:
+                pass
+        elif max_price:
+            try:
+                max_price = float(max_price)
+                products = products.filter(price__lte=max_price)
+            except ValueError:
+                pass
 
         # Sorting
         if sort_by == 'price_asc':
@@ -97,6 +125,8 @@ class ProductView(TemplateView):
         context['search_query'] = search_query
         context['selected_category'] = category_filter
         context['sort_by'] = sort_by
+        context['min_price'] = min_price
+        context['max_price'] = max_price
 
         return context
 class CheckoutView(LoginRequiredMixin, CreateView):

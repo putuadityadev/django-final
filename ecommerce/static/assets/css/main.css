@@ -233,16 +233,12 @@ h6 {
     transition: 0.3s;
   }
 
-  .navmenu>ul>li>a:before {
-    content: "";
-    position: absolute;
-    height: 2px;
-    bottom: -6px;
-    left: 0;
-    background-color: var(--nav-hover-color);
-    visibility: hidden;
-    width: 0px;
-    transition: all 0.3s ease-in-out 0s;
+  #header {
+    background-color: #121212; /* Warna hitam yang Anda inginkan */
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1000;
   }
 
   .navmenu a:hover:before,

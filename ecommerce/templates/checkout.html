@@ -1,112 +1,166 @@
 {% extends "base.html" %}
-{% block title %}Check Out{% endblock title %}
-{% block content %}
+{% block title %}Checkout - D-Shop{% endblock title %}
 
-<h1>Welcome to D-Shop</h1>
-
-{% endblock content %}
-
-{% load static %}
 {% block body %}
+<section class="checkout-section py-5">
+    <div class="container">
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                <strong>{{ message }}</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
 
-<section id="portfolio" class="portfolio">
-  <div class="container">
-    {% for message in messages %}
-    <div
-      class="alert alert-{{ message.tags }} alert-dismissible fade show"
-      role="alert"
-    >
-      <strong>{{ message }}</strong>
-      <button
-        type="button"
-        class="btn-close"
-        data-bs-dismiss="alert"
-        aria-label="Close"
-      ></button>
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h2 class="section-title">Complete Your <span>Purchase</span></h2>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Cart Items Section -->
+            <div class="col-lg-6 mb-4">
+                <div class="card cart-items-card">
+                    <div class="card-header bg-white">
+                        <h4 class="text-dark fw-bold">Your Cart Items</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-group" id="items">
+                            <!-- Cart items will be dynamically added here -->
+                        </ul>
+                        
+                        <div class="cart-total mt-3">
+                            <h5 class="text-end">
+                                Total: $ <span id="totalprice" class="text-danger"></span>
+                            </h5>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Checkout Form Section -->
+            <div class="col-lg-6">
+                <div class="card checkout-form-card">
+                    <div class="card-header bg-white">
+                        <h4 class="text-dark fw-bold">Shipping Details</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/checkout/">
+                            {% csrf_token %}
+                            <input type="hidden" name="itemsJson" id="itemsJson">
+                            <input type="hidden" id="amt" name="amt">
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Full Name</label>
+                                    <input type="text" class="form-control" name="name" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" name="email" value="{{user.email}}" required>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Line 1</label>
+                                    <input type="text" class="form-control" name="address1" required>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Address Line 2</label>
+                                    <input type="text" class="form-control" name="address2">
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">City</label>
+                                    <input type="text" class="form-control" name="city" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">State</label>
+                                    <input type="text" class="form-control" name="state" required>
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label class="form-label">Pin Code</label>
+                                    <input type="text" class="form-control" name="zip_code" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" name="phone" required>
+                            </div>
+
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-danger btn-lg">
+                                    <i class="bi bi-cart-check me-2"></i>Place Order
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    {% endfor %}
-  </div>
+</section>
 
-  <div class="section-title">
-    <h2>Checkout <span>Products</span></h2>
-  </div>
+<style>
+.section-title {
+    margin-bottom: 30px;
+    text-align: center;
+}
+.section-title span {
+    color: #dc3545;
+}
+.cart-items-card, .checkout-form-card {
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+.card-header {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+.form-control {
+    border-radius: 8px;
+}
+.btn-danger {
+    border-radius: 8px;
+}
 
+.cart-items-card, .checkout-form-card {
+  border-radius: 10px;
+  overflow: hidden; /* Ini akan mencegah border terputus */
+  border: 1px solid #e0e0e0;
+}
 
-  <div class="container">
-    <div class="col my-4">
-      <h2>Step 1 - My Awesome Cart Express Checkout - Review Your Cart Items</h2>
-      <div class="my-4">
-        <ul class="list-group" id="items">
-        </ul>
-      </div>
-      <nav aria-label="breadcrumb">
-        <ol class="breadcrumb mt-3">
-          <li class="breadcrumb-item active" aria-current="page">
-            Your Cart Total Is <b>Rs. <span id="totalprice"></span> <span id="amount"></span></b>. Enter your details below & place your order. Thanks for using Shopping Cart!
-          </li>
-        </ol>
-      </nav>
-    </div>
-  </div>
-  
+.card-header {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
 
-  <div class="col my-4 text-center">
-    <div class="d-inline-block col-md-8 mx-auto">
-    <h2>Step 2 - Enter Address & Other Details:</h2>
-    <form method="post" action="/checkout/">{% csrf_token %}
-        <input type="hidden" name="itemsJson" id="itemsJson">
-        <input type="hidden" id="amt" name="amt">
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputname">Name</label>
-                <input type="text" class="form-control mt-3" id="name" name="name" placeholder="Name" required>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputEmail4">Email</label>
-                <input type="email" class="form-control mt-3" id="email" name="email" placeholder="Email" value="{{user.email}}" required>
-            </div>
-        
-        </div>
-        <div class="form-row">
-        <div class="form-group col-md-6">
-            <label for="inputAddress">Address</label>
-            <input type="text" class="form-control mt-3" id="address1" name="address1" placeholder="1234 Main St" required>
-        </div>
-        <div class="form-group col-md-6">
-            <label for="inputAddress">Address line 2</label>
-            <input type="text" class="form-control mt-3" id="address2" name="address2" placeholder="1234 Main St" required>
-        </div>
-        </div>
+.minus-item, .plus-item {
+  background-color: #DC3545;
+  color: white !important;
+  border: none;
+  padding: 2px 8px;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+  font-weight: bold;
+}
 
-        <div class="form-row">
-            <div class="form-group col-md-6">
-                <label for="inputCity">City</label>
-                <input type="text" class="form-control mt-3" id="city" name="city" required>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="inputState">State</label>
-                <input type="text" class="form-control mt-3" id="state" name="state"  placeholder="Enter State" required>
-            </div>
-            </div>
-          
-        <div class="form-row">
-        <div class="form-group col-md-6">
-                <label for="inputZip">Pin Code</label>
-                <input type="number" class="form-control mt-3" id="zip_code" name="zip_code" required>
-            </div>
-        <div class="form-group col-md-6">
-            <label for="inputZip">Phone Number</label>
-            <input type="number" class="form-control mt-3" id="phone" name="phone" required>
-        </div>
-        <br>
-    
-        
-        <button id="btn" type="submit" class="btn btn-success btn-sm btn-block col-md-4">Place Order</button>
-    </form>
-  </div>
-</div>
+.minus-item:hover, .plus-item:hover {
+  background-color: #C82333;
+  transform: scale(1.1);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
 
-</div>
+.minus-item:active, .plus-item:active {
+  transform: scale(0.95);
+  background-color: #A71D2A;
+}
+</style>
 
 <script src="https://code.jquery.com/jquery-3.3.1.js"
 integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
@@ -116,52 +170,112 @@ crossorigin="anonymous"></script>
 
 
 <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Inisialisasi cart dari localStorage
+    var cart = JSON.parse(localStorage.getItem('cart')) || {};
+    
+    // Hitung total item di cart
+    var totalItems = Object.keys(cart).reduce((sum, item) => sum + cart[item][0], 0);
+    
+    // Update badge cart
+    var cartBadge = document.getElementById('cart');
+    if (cartBadge) {
+        cartBadge.innerHTML = totalItems;
+    }
+});
+
 if (localStorage.getItem('cart') == null) {
-var cart = {};
+  var cart = {};
 } else {
-cart = JSON.parse(localStorage.getItem('cart'));
+  cart = JSON.parse(localStorage.getItem('cart'));
 }
-console.log(cart);
 
 var sum = 0;
 var totalPrice = 0;
-if ($.isEmptyObject(cart)) {
-//if object is empty
-mystr = `<p>Your cart is empty, please add some items to your cart before checking out!</p>`
-$('#items').append(mystr);
-} else {
-for (item in cart) {
-let name = cart[item][1];
-let qty = cart[item][0];
-let itemPrice = cart[item][2];
-sum = sum + qty;
-totalPrice = totalPrice + qty* itemPrice;
 
-mystr = `<li class="list-group-item d-flex justify-content-between align-items-center">
-        ${name}
-        <div><b> Price : ${itemPrice}</b></div>
-        <span class="badge badge-primary badge-pill">${qty}</span>
-    </li>`
-$('#items').append(mystr);
+function updateCartDisplay() {
+  $('#items').empty(); // Bersihkan daftar item sebelumnya
+  sum = 0;
+  totalPrice = 0;
+
+  if ($.isEmptyObject(cart)) {
+      let mystr = `<p>Your cart is empty, please add some items to your cart before checking out!</p>`;
+      $('#items').append(mystr);
+  } else {
+      for (item in cart) {
+          let name = cart[item][1];
+          let qty = cart[item][0];
+          let itemPrice = cart[item][2];
+          let imageUrl = cart[item][3];
+
+          sum += qty;
+          totalPrice += qty * itemPrice;
+
+          let mystr = `
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+              <div class="d-flex align-items-center">
+                  <img src="${imageUrl}" alt="${name}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 15px;">
+                  <div>
+                      <h6 class="mb-2">${name}</h6>
+                      <div class="d-flex align-items-center">
+                          <button class="btn btn-md  minus-item " data-item="${item}" >-</button>
+                          <span class="mx-2">${qty}</span>
+                          <button class="btn btn-md  plus-item" data-item="${item}"  >+</button>
+                      </div>
+                  </div>
+              </div>
+              <div>
+                  <span class="text-muted">$${(itemPrice * qty).toFixed(2)}</span>
+              </div>
+          </li>
+          
+          `;
+          
+          $('#items').append(mystr);
+      }
+  }
+
+  // Update total price
+  document.getElementById('totalprice').innerHTML = totalPrice.toFixed(2);
+  $('#itemsJson').val(JSON.stringify(cart));
+  document.getElementById("amt").value = totalPrice;
+
+  // Update cart badge
+  document.getElementById('cart').innerHTML = sum;
+  localStorage.setItem('cart', JSON.stringify(cart));
 }
-document.getElementById('totalprice').innerHTML=totalPrice
 
-}
-document.getElementById('totalprice').innerHTML = totalPrice;
+// Event listener untuk tombol minus
+$(document).on('click', '.minus-item', function() {
+  let item = $(this).data('item');
+  if (cart[item]) {
+      cart[item][0]--;
+      if (cart[item][0] <= 0) {
+          delete cart[item];
+      }
+      updateCartDisplay();
+  }
+});
 
-$('#itemsJson').val(JSON.stringify(cart));
+// Event listener untuk tombol plus
+$(document).on('click', '.plus-item', function() {
+  let item = $(this).data('item');
+  if (cart[item]) {
+      cart[item][0]++;
+      updateCartDisplay();
+  }
+});
 
-
+// Inisialisasi tampilan cart
+updateCartDisplay();
 
 {% if thank %}
 alert('Thanks for ordering with us. Your order is is {{id}}. Use it to track your order using our order tracker');
 localStorage.clear();
 document.location = "/";
 {% endif %}
-
-var test = `${totalPrice}`;
-document.getElementById("amt").value = test;
 </script>
+
 
 
 

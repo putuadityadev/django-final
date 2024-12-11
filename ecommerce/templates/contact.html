@@ -1,54 +1,133 @@
 {% extends "base.html" %}
 {% block title %}Contact Us{% endblock title %}
 {% block body %}
-<h1 class="text-center mt-3">Contact Us</h1>
-<div class="container mt-1">
 
-  {% if messages %}
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-          {{ message }}
-          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-    {% endfor %}
-  {% endif %}
 
-  <div class="row">
-    <div class="col-md-3"></div>
-
-    <div class="col-md-6">
-      <form action="/contact" method="post">
-        {% csrf_token %}
-
-        <div class="mb-3">
-            <label for="name" class="form-label">Full Name</label>
-            <input type="text" class="form-control" id="name" name="name" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="email" class="form-label">Email</label>
-            <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
-        </div>
-
-        <div class="mb-3">
-            <label for="pass1" class="form-label">How can i help you?</label>
-            <textarea type="text" class="form-control" id="desc" name="desc" required></textarea>
-        </div>
-
-        <div class="mb-3">
-            <label for="pnumber" class="form-label">Phone Number</label>
-            <input type="number" class="form-control" id="pnumber" name="pnumber" required>
-        </div>
-
-        <div class="text-center mb-3">
-            <button type="submit" class="btn btn-dark">Submit</button>
-        </div>
-
-    </form>
+<section id="contact" class="contact section" style="margin: 100px">
+  <div class="container">
+    <div class="section-title" data-aos="fade-up">
+      <h2>Contact D-Shop</h2>
+      <p><span>Get in</span> <span class="description-title">Touch</span></p>
     </div>
 
-    <div class="col-md-3"></div>
-  </div>
-</div>
 
+    <div class="row gy-4" data-aos="fade-up" data-aos-delay="100">
+      <!-- Contact Info -->
+      <div class="col-lg-4">
+        <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="100">
+          <i class="bi bi-geo-alt flex-shrink-0"></i>
+          <div>
+            <h4>Location:</h4>
+            <p>Jakarta, Indonesia</p>
+          </div>
+        </div>
+
+        <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="200">
+          <i class="bi bi-envelope flex-shrink-0"></i>
+          <div>
+            <h4>Email:</h4>
+            <p>support@dshop.com</p>
+          </div>
+        </div>
+
+        <div class="info-item d-flex" data-aos="fade-up" data-aos-delay="300">
+          <i class="bi bi-phone flex-shrink-0"></i>
+          <div>
+            <h4>Call:</h4>
+            <p>+62 812 3456 7890</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Contact Form -->
+      <div class="col-lg-8">
+        <form action="/contact/" method="post" class="contact-form" data-aos="fade-up" data-aos-delay="200">
+          {% csrf_token %}
+          <div class="row">
+            <div class="col-md-6 form-group">
+              <label for="name" class="form-label">Full Name</label>
+              <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="col-md-6 form-group">
+              <label for="email" class="form-label">Email</label>
+              <input type="email" class="form-control" id="email" name="email" value="{{user.email}}" required>
+            </div>
+          </div>
+          
+          <div class="form-group mt-3">
+            <label for="pnumber" class="form-label">Phone Number</label>
+            <input type="number" class="form-control" id="pnumber" name="phone_number" required>
+          </div>
+          
+          <div class="form-group mt-3">
+            <label for="desc" class="form-label">How can we help you?</label>
+            <textarea class="form-control" id="desc" name="desc" rows="5" required></textarea>
+          </div>
+          
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-danger">Send Message</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+.contact .section-title {
+  margin-bottom: 30px;
+}
+
+.contact .info-item {
+  background: #f4f4f4;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+}
+
+.contact .info-item i {
+  font-size: 24px;
+  color: #ffffff;
+  margin-right: 15px;
+  background-color: #dc3545;
+  padding: 10px;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex; 
+  align-items: center;
+  justify-content: center;
+}
+
+.contact .contact-form {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.contact .contact-form .form-group {
+  margin-bottom: 15px;
+}
+
+.contact .contact-form .form-control {
+  border-radius: 10px;
+}
+
+.contact .contact-form .form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+
+.contact .contact-form button {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  border-radius: 10px;
+  padding: 10px 24px;
+}
+
+.contact .contact-form button:hover {
+  background-color: #c82333;
+}
+</style>
 {% endblock body %}
