@@ -148,4 +148,34 @@ MESSAGE_TAGS = {
 }
 
 
+MIDTRANS_SERVER_KEY = 'SB-Mid-server-wOabnFrSCeH-PU5X5KtiJ-NY'
+MIDTRANS_CLIENT_KEY = 'SB-Mid-client-cnTrhV7FSqIOXFQU'
+MIDTRANS_MERCHANT_ID = 'G148114990'
+MIDTRANS_IS_PRODUCTION = False
 
+MIDTRANS_CONFIG = {
+    'server_key': 'SB-Mid-server-wOabnFrSCeH-PU5X5KtiJ-NY',
+    'client_key': 'SB-Mid-client-cnTrhV7FSqIOXFQU',
+    'is_production': False,
+    'is_sanitized': True
+}
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+        'midtrans': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+        }
+    }
+}

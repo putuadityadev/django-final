@@ -10,6 +10,18 @@ from django.urls import reverse_lazy
 from django.db.models import Q
 from math import ceil
 from ecommerceapp.models import Contact, Product, OrderUpdate, Orders
+import base64
+import json
+import requests
+import time
+from django.conf import settings
+import midtransclient
+from django.http import JsonResponse
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import csrf_exempt
+import logging
+
+
 
 
 
@@ -129,33 +141,238 @@ class ProductView(TemplateView):
         context['max_price'] = max_price
 
         return context
+
+logger = logging.getLogger(__name__)
+
+@method_decorator(csrf_exempt, name='dispatch')
 class CheckoutView(LoginRequiredMixin, CreateView):
     model = Orders
     template_name = 'checkout.html'
     fields = ['items_json', 'name', 'amount', 'email', 'address1', 
             'address2', 'city', 'state', 'zip_code', 'phone']
-    success_url = reverse_lazy('home')  # Sesuaikan dengan nama URL home Anda
+    success_url = reverse_lazy('home')
 
-    def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            messages.warning(request, "Login & Try Again")
-            return redirect('/auth/login')
-        return super().dispatch(request, *args, **kwargs)
+    def post(self, request, *args, **kwargs):
+        try:
+            # Debug print
+            print("Received POST request")
+            print("Request headers:", request.headers)
+            print("Request POST data:", request.POST)
+            print("Is AJAX:", request.headers.get('X-Requested-With') == 'XMLHttpRequest')
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        
-        # Tambahkan logika OrderUpdate
-        update = OrderUpdate(
-            order_id=self.object.order_id, 
-            update_desc="the order has been placed"
-        )
-        update.save()
-        
-        return response
+            # Parsing items dari itemsJson
+            items_json = json.loads(request.POST.get('itemsJson', '{}'))
+            item_details = []
+
+            for key, item in items_json.items():
+                qty, name, price, image = item
+                item_details.append({
+                    'id': key,
+                    'price': int(price),
+                    'quantity': qty,
+                    'name': name
+                })
+
+            # Modifikasi data untuk sesuaikan dengan nama field model
+            post_data = request.POST.copy()
+            post_data['items_json'] = post_data.get('itemsJson', '')
+            post_data['amount'] = post_data.get('amt', '')
+
+            # Buat form baru dengan data yang sudah dimodifikasi
+            form = self.get_form_class()(post_data)
+            
+            print("Form validation:", form.is_valid())
+            
+            if form.is_valid():
+                # Set user dan additional fields
+                form.instance.user = request.user
+                form.instance.oid = f"ORDER-{int(time.time())}"  # Generate unique order ID
+                form.instance.paymentstatus = 'PENDING'
+
+                # Simpan order
+                order = form.save()
+                
+                # Debug print order details
+                print(f"Order created: {order.order_id}")
+                print(f"Order amount: {order.amount}")
+
+                # Tambahkan logika OrderUpdate
+                update = OrderUpdate.objects.create(
+                    order_id=order.order_id, 
+                    update_desc="Order placed successfully"
+                )
+
+                # Generate Midtrans Token
+                try:
+                    snap = midtransclient.Snap(
+                        is_production=settings.MIDTRANS_IS_PRODUCTION,
+                        server_key=settings.MIDTRANS_SERVER_KEY,
+                        client_key=settings.MIDTRANS_CLIENT_KEY
+                    )
+
+                    # Payload transaksi dengan item details yang lebih detail
+                    param = {
+                        "transaction_details": {
+                            "order_id": str(order.oid),
+                            "gross_amount": int(order.amount)
+                        },
+                        "credit_card": {
+                            "secure": True
+                        },
+                        "customer_details": {
+                            "first_name": order.name,
+                            "email": order.email,
+                            "phone": order.phone or "081234567890",
+                            "billing_address": {
+                                "first_name": order.name,
+                                "address": order.address1,
+                                "city": order.city,
+                                "postal_code": order.zip_code,
+                                "country_code": "IDN"
+                            }
+                        },
+                        "item_details": item_details or [
+                            {
+                                "id": "item1",
+                                "price": int(order.amount),
+                                "quantity": 1,
+                                "name": "Order Payment"
+                            }
+                        ],
+                        "enabled_payments": [
+                            'credit_card', 
+                            'bca', 
+                            'bni', 
+                            'mandiri', 
+                            'gopay', 
+                            'shopeepay'
+                        ]
+                    }
+
+                    # Debug print payload
+                    print("Midtrans Payload:", param)
+
+                    # Buat transaksi
+                    transaction = snap.create_transaction(param)
+                    
+                    # Debug print token
+                    print("Midtrans Transaction Token:", transaction.get('token'))
+
+                    # Simpan token pembayaran
+                    order.payment_token = transaction['token']
+                    order.save()
+
+                    # Kembalikan response JSON
+                    return JsonResponse({
+                        'status': 'success',
+                        'midtrans_token': transaction['token'],
+                        'order_id': order.oid
+                    })
+
+                except midtransclient.MidtransAPIError as midtrans_api_error:
+                    # Log error Midtrans API
+                    print(f"Midtrans API Error: {midtrans_api_error}")
+                    print(f"Error Response: {midtrans_api_error.raw_response}")
+                    
+                    # Hapus order yang gagal
+                    order.delete()
+                    
+                    return JsonResponse({
+                        'status': 'error', 
+                        'message': f"Payment Gateway Error: {str(midtrans_api_error)}"
+                    }, status=400)
+
+                except Exception as e:
+                    print(f"Unexpected Error: {e}")
+                    return JsonResponse({
+                        'status': 'error', 
+                        'message': "Terjadi kesalahan tidak terduga"
+                    }, status=500)
+
+            else:
+                # Jika form tidak valid
+                print("Form Errors:", form.errors)
+                return JsonResponse({
+                    'status': 'error',
+                    'errors': dict(form.errors)
+                }, status=400)
+
+        except Exception as e:
+            # Tangani error umum
+            logger.error(f"Unexpected Error: {e}")
+            print(f"Unexpected Error: {e}")
+            return JsonResponse({
+                'status': 'error', 
+                'message': "Terjadi kesalahan tidak terduga"
+            }, status=500)
 
 class ProductDetailView(DetailView):
     model = Product
     template_name = 'detail-product.html'
     context_object_name = 'product'
     pk_url_kwarg = 'product_id'
+    
+
+class OrderSuccessView(TemplateView):
+    template_name = 'order_success.html'
+
+
+@csrf_exempt
+def midtrans_payment_handler(request):
+    try:
+        # Terima notification dari Midtrans
+        notification_body = request.body.decode('utf-8')
+        notification_dict = json.loads(notification_body)
+        
+        # Validasi signature
+        snap = midtransclient.Snap(
+            is_production=settings.MIDTRANS_IS_PRODUCTION,
+            server_key=settings.MIDTRANS_SERVER_KEY
+        )
+        
+        # Verifikasi status transaksi
+        status = snap.transaction.notification(notification_dict)
+        
+        # Ambil order
+        order = Orders.objects.get(oid=status['order_id'])
+        
+        # Update status pembayaran
+        if status['transaction_status'] == 'capture':
+            order.payment_status = 'PAID'
+        elif status['transaction_status'] in ['deny', 'cancel', 'expire']:
+            order.payment_status = 'FAILED'
+        
+        order.save()
+        
+        # Buat update order
+        OrderUpdate.objects.create(
+            order_id=order.order_id,
+            update_desc=f"Payment status updated to {order.payment_status}"
+        )
+        
+        return JsonResponse({'status': 'success'})
+    
+    except Exception as e:
+        logger.error(f"Midtrans Callback Error: {e}")
+        return JsonResponse({'status': 'error'}, status=400)
+@csrf_exempt
+def update_payment_status(request):
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            order_id = data.get('order_id')
+            status = data.get('status')
+
+            order = Orders.objects.get(oid=order_id)
+            order.payment_status = status
+            order.save()
+
+            return JsonResponse({
+                'status': 'success',
+                'message': 'Payment status updated'
+            })
+        except Exception as e:
+            return JsonResponse({
+                'status': 'error',
+                'message': str(e)
+            }, status=400)

@@ -45,7 +45,7 @@
                         <h4 class="text-dark fw-bold">Shipping Details</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/checkout/">
+                        <form id="checkoutForm" method="post" action="/checkout/" novalidate>
                             {% csrf_token %}
                             <input type="hidden" name="itemsJson" id="itemsJson">
                             <input type="hidden" id="amt" name="amt">
@@ -54,10 +54,12 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Full Name</label>
                                     <input type="text" class="form-control" name="name" required>
+                                    <div class="invalid-feedback">Nama harus diisi</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Email</label>
                                     <input type="email" class="form-control" name="email" value="{{user.email}}" required>
+                                    <div class="invalid-feedback">Email tidak valid</div>
                                 </div>
                             </div>
 
@@ -65,9 +67,10 @@
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label">Address Line 1</label>
                                     <input type="text" class="form-control" name="address1" required>
+                                    <div class="invalid-feedback">Alamat harus diisi</div>
                                 </div>
                                 <div class="col-md-6 mb-3">
-                                    <label class="form-label">Address Line 2</label>
+                                    <label class="form-label">Address Line 2 (Optional)</label>
                                     <input type="text" class="form-control" name="address2">
                                 </div>
                             </div>
@@ -76,24 +79,28 @@
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">City</label>
                                     <input type="text" class="form-control" name="city" required>
+                                    <div class="invalid-feedback">Kota harus diisi</div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">State</label>
                                     <input type="text" class="form-control" name="state" required>
+                                    <div class="invalid-feedback">Provinsi harus diisi</div>
                                 </div>
                                 <div class="col-md-4 mb-3">
                                     <label class="form-label">Pin Code</label>
                                     <input type="text" class="form-control" name="zip_code" required>
+                                    <div class="invalid-feedback">Kode pos harus diisi</div>
                                 </div>
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Phone Number</label>
                                 <input type="tel" class="form-control" name="phone" required>
+                                <div class="invalid-feedback">Nomor telepon harus diisi</div>
                             </div>
 
                             <div class="text-center">
-                                <button type="submit" class="btn btn-danger btn-lg">
+                                <button type="submit" class="btn btn-danger btn-lg" id="placeOrderBtn">
                                     <i class="bi bi-cart-check me-2"></i>Place Order
                                 </button>
                             </div>
@@ -105,178 +112,172 @@
     </div>
 </section>
 
+<!-- Midtrans Payment Modal -->
+<div class="modal fade" id="paymentMethodModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Choose Payment Method</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center" id="paymentMethodContainer">
+                <!-- Midtrans payment methods will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Styles -->
 <style>
-.section-title {
-    margin-bottom: 30px;
-    text-align: center;
-}
-.section-title span {
-    color: #dc3545;
-}
-.cart-items-card, .checkout-form-card {
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    border-radius: 10px;
-}
-.card-header {
-    border-top-left-radius: 10px;
-    border-top-right-radius: 10px;
-}
-.form-control {
-    border-radius: 8px;
-}
-.btn-danger {
-    border-radius: 8px;
-}
-
-.cart-items-card, .checkout-form-card {
-  border-radius: 10px;
-  overflow: hidden; /* Ini akan mencegah border terputus */
-  border: 1px solid #e0e0e0;
-}
-
-.card-header {
-  border-top-left-radius: 10px;
-  border-top-right-radius: 10px;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.minus-item, .plus-item {
-  background-color: #DC3545;
-  color: white !important;
-  border: none;
-  padding: 2px 8px;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  font-weight: bold;
-}
-
-.minus-item:hover, .plus-item:hover {
-  background-color: #C82333;
-  transform: scale(1.1);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.minus-item:active, .plus-item:active {
-  transform: scale(0.95);
-  background-color: #A71D2A;
-}
+    /* Your existing styles here */
+    .invalid-feedback {
+        display: none;
+        color: #dc3545;
+    }
+    .form-control.is-invalid {
+        border-color: #dc3545;
+    }
+    .form-control.is-invalid:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+    }
 </style>
 
-<script src="https://code.jquery.com/jquery-3.3.1.js"
-integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
-crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.6/umd/popper.min.js" integrity="sha384-wHAiFfRlMFy6i5SRaxvfOCifBUQy1xHdJ/yoi7FRNXMRBu5WHdZYu1hA6ZOblgut" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.2.1/js/bootstrap.min.js" integrity="sha384-B0UglyR+jN6CkvvICOB2joaf5I4l3gm9GU6Hc1og6Ls7i6U/mkkaduKaBhlAXv9k" crossorigin="anonymous"></script>
-
+<!-- Scripts -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://app.sandbox.midtrans.com/snap/snap.js"></script>
 
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Inisialisasi cart dari localStorage
-    var cart = JSON.parse(localStorage.getItem('cart')) || {};
-    
-    // Hitung total item di cart
-    var totalItems = Object.keys(cart).reduce((sum, item) => sum + cart[item][0], 0);
-    
-    // Update badge cart
-    var cartBadge = document.getElementById('cart');
-    if (cartBadge) {
-        cartBadge.innerHTML = totalItems;
+document.addEventListener('DOMContentLoaded', function() {
+    const cart = JSON.parse(localStorage.getItem('cart')) || {};
+    const checkoutForm = document.getElementById('checkoutForm');
+    const placeOrderBtn = document.getElementById('placeOrderBtn');
+    const paymentMethodModal = new bootstrap.Modal(document.getElementById('paymentMethodModal'));
+
+    // Cart Initialization and Display
+    function updateCartDisplay() {
+        const itemsContainer = $('#items');
+        const totalPriceSpan = $('#totalprice');
+        const itemsJsonInput = $('#itemsJson');
+        const amtInput = $('#amt');
+
+        itemsContainer.empty();
+        let totalPrice = 0;
+
+        if (Object.keys(cart).length === 0) {
+            itemsContainer.append('<p>Your cart is empty. Please add items before checkout.</p>');
+        } else {
+            Object.entries(cart).forEach(([itemKey, itemDetails]) => {
+                const [qty, name, price, imageUrl] = itemDetails;
+                 totalPrice += qty * price;
+                itemsContainer.append(`
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center">
+                            <img src="${imageUrl}" alt="${name}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 15px;">
+                            <div>
+                                <h6 class="mb-2">${name}</h6>
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-md minus-item" data-item="${itemKey}">-</button>
+                                    <span class="mx-2">${qty}</span>
+                                    <button class="btn btn-md plus-item" data-item="${itemKey}">+</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-muted">$${(price * qty).toFixed(2)}</span>
+                        </div>
+                    </li>
+                `);
+            });
+        }
+
+        totalPriceSpan.text(totalPrice.toFixed(2));
+        itemsJsonInput.val(JSON.stringify(cart));
+        amtInput.val(totalPrice);
     }
+
+    // Event listeners for plus and minus buttons
+    $(document).on('click', '.minus-item', function() {
+        const itemKey = $(this).data('item');
+        if (cart[itemKey]) {
+            cart[itemKey][0]--;
+            if (cart[itemKey][0] <= 0) {
+                delete cart[itemKey];
+            }
+            updateCartDisplay();
+        }
+    });
+
+    $(document).on('click', '.plus-item', function() {
+        const itemKey = $(this).data('item');
+        if (cart[itemKey]) {
+            cart[itemKey][0]++;
+            updateCartDisplay();
+        }
+    });
+
+    // Form submission
+    checkoutForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        if (this.checkValidity()) {
+            const formData = new FormData(this);
+            fetch('/checkout/', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    showPaymentOptions(data.midtrans_token);
+                } else {
+                    alert(`Error: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An unexpected error occurred');
+            });
+        } else {
+            alert('Please fill in all required fields');
+        }
+    });
+
+    // Show payment options
+    function showPaymentOptions(midtransToken) {
+        const paymentMethods = `
+            <button class="btn btn-primary" onclick="payWithMidtrans('${midtransToken}')">Pay with Midtrans</button>
+        `;
+        $('#paymentMethodContainer').html(paymentMethods);
+        paymentMethodModal.show();
+    }
+
+    // Payment function
+    window.payWithMidtrans = function(midtransToken) {
+        snap.pay(midtransToken, {
+            onSuccess: function(result) {
+                alert('Payment successful!');
+                window.location.href = '/order-success/';
+            },
+            onPending: function(result) {
+                alert('Payment is pending');
+            },
+            onError: function(result) {
+                alert('Payment failed');
+            },
+            onClose: function() {
+                console.log('Payment modal closed');
+            }
+        });
+    };
+
+    // Initialize cart display
+    updateCartDisplay();
 });
-
-if (localStorage.getItem('cart') == null) {
-  var cart = {};
-} else {
-  cart = JSON.parse(localStorage.getItem('cart'));
-}
-
-var sum = 0;
-var totalPrice = 0;
-
-function updateCartDisplay() {
-  $('#items').empty(); // Bersihkan daftar item sebelumnya
-  sum = 0;
-  totalPrice = 0;
-
-  if ($.isEmptyObject(cart)) {
-      let mystr = `<p>Your cart is empty, please add some items to your cart before checking out!</p>`;
-      $('#items').append(mystr);
-  } else {
-      for (item in cart) {
-          let name = cart[item][1];
-          let qty = cart[item][0];
-          let itemPrice = cart[item][2];
-          let imageUrl = cart[item][3];
-
-          sum += qty;
-          totalPrice += qty * itemPrice;
-
-          let mystr = `
-          <li class="list-group-item d-flex justify-content-between align-items-center">
-              <div class="d-flex align-items-center">
-                  <img src="${imageUrl}" alt="${name}" style="width: 50px; height: 50px; object-fit: cover; margin-right: 15px;">
-                  <div>
-                      <h6 class="mb-2">${name}</h6>
-                      <div class="d-flex align-items-center">
-                          <button class="btn btn-md  minus-item " data-item="${item}" >-</button>
-                          <span class="mx-2">${qty}</span>
-                          <button class="btn btn-md  plus-item" data-item="${item}"  >+</button>
-                      </div>
-                  </div>
-              </div>
-              <div>
-                  <span class="text-muted">$${(itemPrice * qty).toFixed(2)}</span>
-              </div>
-          </li>
-          
-          `;
-          
-          $('#items').append(mystr);
-      }
-  }
-
-  // Update total price
-  document.getElementById('totalprice').innerHTML = totalPrice.toFixed(2);
-  $('#itemsJson').val(JSON.stringify(cart));
-  document.getElementById("amt").value = totalPrice;
-
-  // Update cart badge
-  document.getElementById('cart').innerHTML = sum;
-  localStorage.setItem('cart', JSON.stringify(cart));
-}
-
-// Event listener untuk tombol minus
-$(document).on('click', '.minus-item', function() {
-  let item = $(this).data('item');
-  if (cart[item]) {
-      cart[item][0]--;
-      if (cart[item][0] <= 0) {
-          delete cart[item];
-      }
-      updateCartDisplay();
-  }
-});
-
-// Event listener untuk tombol plus
-$(document).on('click', '.plus-item', function() {
-  let item = $(this).data('item');
-  if (cart[item]) {
-      cart[item][0]++;
-      updateCartDisplay();
-  }
-});
-
-// Inisialisasi tampilan cart
-updateCartDisplay();
-
-{% if thank %}
-alert('Thanks for ordering with us. Your order is is {{id}}. Use it to track your order using our order tracker');
-localStorage.clear();
-document.location = "/";
-{% endif %}
 </script>
-
-
-
 
 {% endblock body %}
