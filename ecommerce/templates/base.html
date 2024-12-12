@@ -58,7 +58,7 @@
         <ul>
             <li><a href="/" class="{% if request.path == '/' %}active{% endif %}">Home</a></li>
             <li><a href="/product" class="{% if request.path == '/product/' %}active{% endif %}">Product</a></li>
-            <li><a href="/blog" class="{% if request.path == '/blog/' %}active{% endif %}">Blog</a></li>
+            <li><a href="/news" class="{% if '/news/' in request.path %}active{% endif %}">News</a></li>
             <li><a href="/contact" class="{% if request.path == '/contact/' %}active{% endif %}">Contact</a></li>
             <li><a href="/profile" class="{% if request.path == '/profile/' %}active{% endif %}">My Profile</a></li>
             

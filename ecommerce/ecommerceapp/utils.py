@@ -1,4 +1,3 @@
-# utils.py di app yang sesuai
 import midtransclient
 
 def generate_midtrans_token(order):

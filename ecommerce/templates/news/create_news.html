@@ -1,0 +1,268 @@
+{% extends "base.html" %}
+{% block title %}Add Apple Tech Insight{% endblock title %}
+{% load static %}
+
+
+{% block body %}
+<section id="create-news" class="create-news section bg-light" style="margin-top: 100px">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-md-10">
+                <div class="news-form-container bg-white shadow-sm rounded-4 p-5" data-aos="fade-up">
+                    <div class="section-title text-center mb-5">
+                        <h2 class="fw-bold text-dark">Create Apple Tech Insight</h2>
+                        <p class="text-muted">
+                            Share the <span style="color : #DC3545">Latest Technology Updates</span>
+                        </p>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="news-form" id="newsForm">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="{{ form.title.id_for_label }}" class="form-label fw-bold">
+                                News Title
+                            </label>
+                            {{ form.title }}
+                            {% if form.title.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.title.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.content.id_for_label }}" class="form-label fw-bold">
+                                News Content
+                            </label>
+                            {{ form.content }}
+                            {% if form.content.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.content.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">Upload Cover Image</label>
+                            <div class="image-upload-container">
+                                <input 
+                                    type="file" 
+                                    name="{{ form.image.name }}" 
+                                    id="{{ form.image.id_for_label }}" 
+                                    accept="image/*" 
+                                    class="image-upload-input"
+                                >
+                                <div class="image-upload-overlay">
+                                    <div class="image-upload-content text-center">
+                                        <i class="bi bi-cloud-upload display-4 text-muted"></i>
+                                        <p class="mt-3 text-muted">
+                                            Drag & Drop or Click to Upload
+                                        </p>
+                                        <small class="text-muted">
+                                            PNG, JPG, WEBP (Max 5MB)
+                                        </small>
+                                    </div>
+                                </div>
+                                <div class="image-preview-container d-none">
+                                    <img src="" alt="Image Preview" class="img-fluid image-preview">
+                                    <button type="button" class="btn btn-sm btn-danger image-remove-btn position-absolute top-0 end-0 m-2">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            {% if form.image.errors %}
+                                <div class="text-danger small mt-2">
+                                    {{ form.image.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-grid">
+                            <button 
+                                type="submit" 
+                                class="btn btn-primary btn-lg rounded-pill fw-bold"
+                            >
+                                <i class="bi bi-send-fill me-2"></i>
+                                Publish Insight
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.image-upload-container {
+    position: relative;
+    border: 2px dashed #e0e0e0;
+    border-radius: 12px;
+    min-height: 250px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+
+.image-upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.image-upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.image-preview-container {
+    position: relative;
+    width: 100%;
+    height: 250px;
+}
+
+.image-preview-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 12px;
+}
+
+.image-remove-btn {
+    z-index: 20;
+}
+
+.image-upload-content {
+    text-align: center;
+}
+
+.image-upload-container:hover {
+    border-color: #DC3545;
+    background-color: rgba(220,53,69,0.05);
+}
+
+.image-upload-input:focus + .image-upload-overlay {
+    border-color: #DC3545;
+}
+
+.form-control:focus {
+    border-color: #DC3545;
+    box-shadow: 0 0 0 0.25rem rgba(220,53,69,0.25);
+}
+
+
+.btn-primary {
+    background-color: #DC3545;
+    border-color: #DC3545;
+}
+
+.btn-primary:hover,
+.btn-primary:focus {
+    background-color: #C82333;
+    border-color: #BD2130;
+}
+
+.highlight {
+    border-color: #DC3545 !important;
+    background-color: rgba(220,53,69,0.1) !important;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const imageUploadInput = document.querySelector('.image-upload-input');
+    const imageUploadContainer = document.querySelector('.image-upload-container');
+    const imageUploadOverlay = document.querySelector('.image-upload-overlay');
+    const imagePreviewContainer = document.querySelector('.image-preview-container');
+    const imagePreview = document.querySelector('.image-preview');
+    const imageRemoveBtn = document.querySelector('.image-remove-btn');
+
+    // Drag and Drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        imageUploadContainer.addEventListener(eventName, preventDefaults, false);
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        imageUploadContainer.addEventListener(eventName, highlight, false);
+    });
+
+    ['dragleave', 'drop'].forEach(eventName => {
+        imageUploadContainer.addEventListener(eventName, unhighlight, false);
+    });
+
+    function highlight() {
+        imageUploadContainer.classList.add('highlight');
+    }
+
+    function unhighlight() {
+        imageUploadContainer.classList.remove('highlight');
+    }
+
+    imageUploadContainer.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFiles(files);
+    }
+
+    // File input change
+    imageUploadInput.addEventListener('change', function(e) {
+        handleFiles(this.files);
+    });
+
+    function handleFiles(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            
+            // Validate file type and size
+            const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+            const maxSize = 5 * 1024 * 1024; // 5MB
+
+            if (!validTypes.includes(file.type)) {
+                alert('Please upload a valid image (JPEG, PNG, WEBP)');
+                return;
+            }
+
+            if (file.size > maxSize) {
+                alert('File size exceeds 5MB limit');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePreview.src = event.target.result;
+                imageUploadOverlay.classList.ad d('d-none');
+                imagePreviewContainer.classList.remove('d-none');
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    imageRemoveBtn.addEventListener('click', function() {
+        imageUploadInput.value = '';
+        imagePreview.src = '';
+        imageUploadOverlay.classList.remove('d-none');
+        imagePreviewContainer.classList.add('d-none');
+    });
+});
+</script>
+{% endblock body %}
