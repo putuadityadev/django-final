@@ -5,48 +5,50 @@
 {% block title %}{{ product.product_name }} - Details{% endblock title %}
 
 {% block body %}
-<section class="product-details py-5" style="margin-top: 100px">
+<section class="product-details-section" style="margin-top: 100px">
     <div class="container">
         <div class="row">
             <!-- Product Image -->
-            <div class="col-md-6 mb-4">
-                <div class="product-image">
+            <div class="col-md-6" data-aos="fade-right">
+                <div class="product-image-container">
                     <img 
                         src="{{ product.image.url }}" 
                         alt="{{ product.product_name }}" 
-                        class="img-fluid rounded shadow-lg" 
+                        class="product-image" 
                         id="pr{{ product.id }}"
                     >
                 </div>
             </div>
 
             <!-- Product Details -->
-            <div class="col-md-6">
-                <div class="product-info">
-                    <h2 class="product-title mb-3" id="namepr{{ product.id }}">{{ product.product_name }}</h2>
+            <div class="col-md-6" data-aos="fade-left">
+                <div class="product-details">
+                    <h2 class="product-title" id="namepr{{ product.id }}">
+                        {{ product.product_name }}
+                    </h2>
                     
                     <div class="product-meta mb-3">
-                        <span class="badge bg-primary me-2">{{ product.category }}</span>
-                        <span class="badge bg-secondary">{{ product.subcategory }}</span>
+                        <span class="product-category">{{ product.category }}</span>
+                        <span class="product-subcategory">{{ product.subcategory }}</span>
                     </div>
 
-                    <div class="product-price mb-3">
-                        <h3 class="text-success">
-                            $<span id="pricepr{{ product.id }}">{{ product.price }}</span>
-                        </h3>
+                    <div class="product-price">
+                        <span id="pricepr{{ product.id }}">
+                            ${{ product.price|floatformat:2 }}
+                        </span>
                     </div>
 
-                    <div class="product-description mb-4">
+                    <div class="product-description">
                         <p>{{ product.desc }}</p>
                     </div>
 
                     <div class="product-actions">
-                        <div class="row g-2">
+                        <div class="row g-3">
                             <div class="col-md-6">
-                                <span id="divpr{{ product.id }}" class="divpr w-100">
+                                <span id="divpr{{ product.id }}" class="divpr">
                                     <button 
                                         id="pr{{ product.id }}" 
-                                        class="btn btn-primary w-100 cart" 
+                                        class="btn btn-danger w-100 cart-btn" 
                                         data-product-id="{{ product.id }}"
                                     >
                                         <i class="bi bi-cart-plus me-2"></i>Add to Cart
@@ -56,20 +58,21 @@
                             <div class="col-md-6">
                                 <button 
                                     id="buyNowBtn{{ product.id }}" 
-                                    class="btn btn-success w-100 buy-now"
+                                    class="btn btn-outline-danger w-100 buy-now-btn"
                                     data-product-id="{{ product.id }}"
                                 >
                                     <i class="bi bi-lightning me-2"></i>Buy Now
                                 </button>
                             </div>
+                            
                             {% if user.is_authenticated %}
                                 {% is_favorite product as favorite_status %}
-                                <div class="col-md-12 mt-2">
+                                <div class="col-md-12 mt-3">
                                     <a 
                                         href="{% url 'toggle_favorite' product_id=product.id %}" 
-                                        class="btn {% if favorite_status %}btn-danger{% else %}btn-outline-danger{% endif %} w-100"
+                                        class="btn {% if favorite_status %}btn-danger{% else %}btn-outline-danger{% endif %} w-100 favorite-btn"
                                     >
-                                        <i class="bi bi-heart{% if favorite_status %}-fill{% endif %}"></i>
+                                        <i class="bi bi-heart{% if favorite_status %}-fill{% endif %} me-2"></i>
                                         {% if favorite_status %}
                                             Remove from Favorites
                                         {% else %}
@@ -81,13 +84,18 @@
                         </div>
                     </div>
 
-                    <!-- Additional Product Details -->
-                    <div class="product-extra-details mt-4">
-                        <h5>Product Specifications</h5>
-                        <ul class="list-unstyled">
-                            <li><strong>Category:</strong> {{ product.category }}</li>
-                            <li><strong>Subcategory:</strong> {{ product.subcategory }}</li>
-                        </ul>
+                    <div class="product-specifications mt-4">
+                        <h5 class="specs-title">Product Specifications</h5>
+                        <div class="specs-details">
+                            <div class="spec-item">
+                                <span class="spec-label">Category</span>
+                                <span class="spec-value">{{ product.category }}</span>
+                            </div>
+                            <div class="spec-item">
+                                <span class="spec-label">Subcategory</span>
+                                <span class="spec-value">{{ product.subcategory }}</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -95,12 +103,128 @@
     </div>
 </section>
 
-{% endblock %}
+<style>
+.product-details-section {
+    background-color: #f8f9fa;
+    padding: 50px 0;
+}
 
-{% block extra_js %}
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
+.product-image-container {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
 
-</script>
+.product-image {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.product-image:hover {
+    transform: scale(1.05);
+}
+
+.product-details {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    padding: 30px;
+}
+
+.product-title {
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.product-meta {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.product-category,
+.product-subcategory {
+    background-color: #dc3545;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 0.8rem;
+}
+
+.product-price {
+    font-size: 2rem;
+    color: #dc3545;
+    margin-bottom: 20px;
+    font-weight: 700;
+}
+
+.product-description {
+    color: #666;
+    margin-bottom: 30px;
+}
+
+.cart-btn {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    transition: all 0.3s ease;
+}
+
+.cart-btn:hover {
+    background-color: #c82333;
+    border-color: #c82333;
+}
+
+.buy-now-btn {
+    border-color: #dc3545;
+    color: #dc3545;
+    transition: all 0.3s ease;
+}
+
+.buy-now-btn:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.favorite-btn {
+    transition: all 0.3s ease;
+}
+
+.product-specifications {
+    background-color: #f1f3f5;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.specs-title {
+    color: #333;
+    margin-bottom: 15px;
+}
+
+.specs-details {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.spec-item {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 10px;
+}
+
+.spec-label {
+    color: #666;
+    font-weight: 600;
+}
+
+.spec-value {
+    color: #333;
+}
+</style>
 {% endblock %}

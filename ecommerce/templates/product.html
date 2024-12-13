@@ -148,6 +148,61 @@
                 .btn-outline-danger:focus {
                     box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
                 }
+                /* Typography Hierarchy */
+                .card {
+                    font-family: 'Inter', sans-serif; /* Gunakan font modern */
+                    transition: all 0.3s ease;
+                }
+            
+                .card .card-title {
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                    color: #333;
+                    margin-bottom: 0.5rem;
+                }
+            
+                .card .card-text {
+                    font-weight: 400;
+                    font-size: 0.9rem;
+                    color: #666;
+                    line-height: 1.5;
+                }
+            
+                .card .card-price {
+                    font-weight: 600;
+                    font-size: 1rem;
+                    color: #dc3545;
+                }
+            
+                /* Z-Index Fix */
+                .filter-section {
+                    z-index: 10; /* Pastikan di bawah navbar */
+                    position: sticky;
+                    top: 100px; /* Sesuaikan dengan tinggi navbar */
+                }
+            
+                /* Tambahan hover effect */
+                .card {
+                    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    transition: transform 0.3s ease, box-shadow 0.3s ease;
+                }
+            
+                .card:hover {
+                    transform: translateY(-10px);
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+                }
+            
+                /* Konsisten dengan desain sebelumnya */
+                .btn-danger {
+                    background-color: #dc3545;
+                    border-color: #dc3545;
+                    transition: all 0.3s ease;
+                }
+            
+                .btn-danger:hover {
+                    background-color: #c82333;
+                    border-color: #c82333;
+                }
             </style>
             <!-- Product Grid -->
             <div class="col-md-9">
