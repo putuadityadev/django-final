@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+{% load custom_filters %}
 
 {% block title %}Products{% endblock title %}
 
 {% block body %}
-
 <section id="portfolio" class="portfolio section mt-5">
     <div class="container-fluid mt-4">
         <div class="row">
@@ -134,6 +134,20 @@
                     background-color: #DC3545;
                     border-color: #DC3545;
                 }
+
+                .btn-outline-danger {
+                    color: #dc3545;
+                    border-color: #dc3545;
+                }
+
+                .btn-outline-danger:hover {
+                    background-color: #dc3545;
+                    color: white;
+                }
+
+                .btn-outline-danger:focus {
+                    box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+                }
             </style>
             <!-- Product Grid -->
             <div class="col-md-9">
@@ -143,22 +157,40 @@
                 <div class="container">
                     <div class="row">
                         {% for i in product %}
-                        <div class="col-md-3 mt-3">
-                            <div class="card">
-                                <img src="/media/{{ i.image }}" class="card-img-top mb-3" alt="not found">
-                                <div class="card-body">
-                                    <h5 class="card-title" id="namepr{{ i.id }}">{{ i.product_name }}</h5>
-                                    <p class="card-text">{{ i.desc|slice:":63" }}...</p>
-                                    <h6 class="card-title mb-3">Price: $<span id="pricepr{{ i.id }}">{{ i.price }}</span></h6>
-                                    <span id="divpr{{ i.id }}" class="divpr">
-                                        <button id="pr{{ i.id }}" class="btn btn-danger cart btn-sm mt-0">Add To Cart</button>
-                                    </span>
-                                    <a href="{% url 'detail-product' product_id=i.id %}">
-                                        <button class="btn btn-success btn-sm cart">View</button>
-                                    </a>
+                            <div class="col-md-3 mt-3">
+                                <div class="card h-100">
+                                    <img src="/media/{{ i.image }}" class="card-img-top mb-3" alt="not found">
+                                    <div class="card-body d-flex flex-column">
+                                        <h5 class="card-title" id="namepr{{ i.id }}">{{ i.product_name }}</h5>
+                                        <p class="card-text flex-grow-1">{{ i.desc|slice:":63" }}...</p>
+                                        
+                                        <div class="d-flex flex-column">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="card-title mb-0">Price: $<span id="pricepr{{ i.id }}">{{ i.price }}</span></h6>
+                                                
+                                                {% if user.is_authenticated %}
+                                                    {% is_favorite i as favorite_status %}
+                                                    <a 
+                                                        href="{% url 'toggle_favorite' product_id=i.id %}" 
+                                                        class="btn {% if favorite_status %}btn-danger{% else %}btn-outline-danger{% endif %} btn-sm"
+                                                    >
+                                                        <i class="bi bi-heart{% if favorite_status %}-fill{% endif %}"></i>
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span id="divpr{{ i.id }}" class="divpr flex-grow-1 me-2">
+                                                    <button id="pr{{ i.id }}" class="btn btn-danger cart btn-sm mt-0 w-100">Add To Cart</button>
+                                                </span>
+                                                <a href="{% url 'detail-product' product_id=i.id %}" class="btn btn-outline-danger btn-sm">
+                                                    View Details
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -168,9 +200,9 @@
     </div>
 </section>
 
-<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js" integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"></script>
 <script>
 // Find out the cart from local storage
 if (localStorage.getItem('cart') == null) {

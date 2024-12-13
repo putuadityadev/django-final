@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% block title %}Edit Profile{% endblock title %}
+{% load static %}
+{% load forms_tag %}  {# Sesuaikan nama load #}
+
+{% block body %}
+<section id="edit-profile" class="edit-profile section" style="margin: 100px">
+    <div class="container">
+        <div class="section-title" data-aos="fade-up">
+            <h2>Edit Profile</h2>
+            <p>Update Your <span class="description-title">Personal Information</span></p>
+        </div>
+
+        <div class="row justify-content-center" data-aos="fade-up" data-aos-delay="100">
+            <div class="col-lg-8 col-md-10">
+                <div class="profile-form-container">
+                    <form method="post" enctype="multipart/form-data" class="contact-form">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4 text-center">
+                            <div class="profile-picture-upload-container">
+                                <input 
+                                    type="file" 
+                                    name="{{ profile_form.profile_picture.name }}" 
+                                    id="{{ profile_form.profile_picture.id_for_label }}" 
+                                    accept="image/*" 
+                                    class="profile-picture-upload-input"
+                                >
+                                <div class="profile-picture-overlay">
+                                    <div class="profile-picture-content text-center">
+                                        <img 
+                                            src="{{ request.user.profile.profile_picture.url }}" 
+                                            alt="Current Profile Picture" 
+                                            class="current-profile-picture img-fluid rounded-circle"
+                                        >
+                                        <div class="profile-picture-hover-content">
+                                            <i class="bi bi-camera display-4 text-white"></i>
+                                            <p class="mt-2 text-white">Change Profile Picture</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="image-preview-container d-none">
+                                    <img src="" alt="Image Preview" class="img-fluid image-preview rounded-circle">
+                                    <button type="button" class="btn btn-sm btn-danger image-remove-btn position-absolute top-0 end-0 m-2">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 form-group">
+                                <label for="{{ user_form.first_name.id_for_label }}" class="form-label">First Name</label>
+                                {{ user_form.first_name|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if user_form.first_name.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {% for error in user_form.first_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+
+                            <div class="col-md-6 form-group">
+                                <label for="{{ user_form.last_name.id_for_label }}" class="form-label">Last Name</label>
+                                {{ user_form.last_name|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if user_form.last_name.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {% for error in user_form.last_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="{{ user_form.email.id_for_label }}" class="form-label">Email</label>
+                            {{ user_form.email|add_class:"form-control"|add_error_class:"is-invalid" }}
+                            {% if user_form.email.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in user_form.email.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="{{ profile_form.phone_number.id_for_label }}" class="form-label">Phone Number</label>
+                            {{ profile_form.phone_number|add_class:"form-control"|add_error_class:"is-invalid" }}
+                            {% if profile_form.phone_number.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in profile_form.phone_number.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group mt-3">
+                            <label for="{{ profile_form.role.id_for_label }}" class="form-label">Account Role</label>
+                            {{ profile_form.role|add_class:"form-select"|add_error_class:"is-invalid" }}
+                            {% if profile_form.role.errors %}
+                                <div class="text-danger small mt-2">
+                                    {% for error in profile_form.role.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <div id="seller-fields" style="display:none;">
+                            <div class="form-group mt-3">
+                                <label for="{{ profile_form.store_name.id_for_label }}" class="form-label">Store Name</label>
+                                {{ profile_form.store_name|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if profile_form.store_name.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {% for error in profile_form.store_name.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="form-group mt-3">
+                                <label for="{{ profile_form.store_description.id_for_label }}" class="form-label">Store Description</label>
+                                {{ profile_form.store_description|add_class:"form-control"|add_error_class:"is-invalid" }}
+                                {% if profile_form.store_description.errors %}
+                                    <div class="text-danger small mt-2">
+                                        {% for error in profile_form.store_description.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="text-center mt-4">
+                            <button type="submit" class="btn btn-danger">Update Profile</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+.edit-profile .section-title {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.edit-profile .contact-form {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.edit-profile .form-group {
+    margin-bottom: 15px;
+}
+
+.edit-profile .form-control {
+    border-radius: 10px;
+}
+
+.edit-profile .form-control:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+
+.edit-profile .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+    border-radius: 10px;
+    padding: 10px 24px;
+}
+
+.edit-profile .btn-danger:hover {
+    background-color: #c82333;
+}
+
+/* Profile Picture Upload Styles */
+.profile-picture-upload-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto 20px;
+    cursor: pointer;
+}
+
+.profile-picture-upload-input {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 10;
+}
+
+.profile-picture-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.current-profile-picture {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-picture-hover-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.profile-picture-upload-container:hover .profile-picture-hover-content {
+    opacity: 1;
+}
+
+.image-preview-container {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.image-preview {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.image-remove-btn {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 20;
+}
+.edit-profile .form-label {
+    color: #495057;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.edit-profile .text-danger {
+    color: #dc3545 !important;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Styling untuk input error */
+.edit-profile .form-control.is-invalid,
+.edit-profile .form-select.is-invalid {
+    border-color: #dc3545;
+    background-image: none;
+}
+
+.edit-profile .form-control.is-invalid:focus,
+.edit-profile .form-select.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+.edit-profile .form-select {
+    border-radius: 10px;
+    border-color: #ced4da;
+    padding: 12px 15px;
+    transition: all 0.3s ease;
+    background-image: none; /* Hapus panah default */
+}
+
+.edit-profile .form-select:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+    outline: none;
+}
+
+.edit-profile .form-select.is-invalid {
+    border-color: #dc3545;
+    background-image: none;
+}
+
+.edit-profile .form-select.is-invalid:focus {
+    border-color: #dc3545;
+    box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const profilePictureInput = document.querySelector('.profile-picture-upload-input');
+    const currentProfilePicture = document.querySelector('.current-profile-picture');
+    const imagePreviewContainer = document.querySelector('.image-preview-container');
+    const imagePreview = document.querySelector('.image-preview');
+    const imageRemoveBtn = document.querySelector('.image-remove-btn');
+
+    profilePictureInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                imagePreview.src = event.target.result;
+                imagePreviewContainer.class .remove('d-none');
+                currentProfilePicture.src = event.target.result; // Update current profile picture
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    imageRemoveBtn.addEventListener('click', function() {
+        profilePictureInput.value = '';
+        imagePreview.src = '';
+        currentProfilePicture.src = "{{ request.user.profile.profile_picture.url }}"; // Reset to current picture
+        imagePreviewContainer.classList.add('d-none');
+    });
+});
+</script>
+{% endblock %}

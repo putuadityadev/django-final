@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block title %}My Profile{% endblock %}
+
+{% block body %}
+<section class="profile-section" style="margin: 100px 0">
+    <div class="container-fluid px-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="section-title text-start p-0" data-aos="fade-up">
+                    <h2>My Profile</h2>
+                </div>
+                
+                <div class="profile-card" data-aos="fade-up" data-aos-delay="100">
+                    <!-- Profile card content remains the same as previous example -->
+                    <div class="profile-card-header">
+                        <img 
+                            src="{{ profile.profile_picture.url|default:'/static/default-profile.png' }}" 
+                            class="profile-img" 
+                            alt="Profile Picture"
+                        >
+                        <a href="{% url 'edit_profile' %}" class="edit-profile-btn">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </div>
+                    <div class="profile-card-body">
+                        <h3>{{ user.get_full_name }}</h3>
+                        <div class="profile-details">
+                            <div class="detail-item">
+                                <i class="bi bi-person"></i>
+                                <span>{{ profile.role|title }} 
+                                    {% if profile.role == 'seller' %}
+                                        • {{ profile.store_name|default:'No Store' }}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-envelope"></i>
+                                <span>{{ user.email }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <i class="bi bi-phone"></i>
+                                <span>{{ profile.phone_number|default:'Not Set' }}</span>
+                            </div>
+                            {% if profile.role == 'seller' %}
+                            <div class="detail-item">
+                                <i class="bi bi-shop"></i>
+                                <span>{{ profile.store_description|truncatewords:10|default:'No Store Description' }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="d-flex justify-content-between align-items-center" data-aos="fade-up">
+                    <div class="section-title p-0">
+                        <h2>Favorite Products</h2>
+                    </div>
+                </div>
+                
+                <div class="row" data-aos="fade-up" data-aos-delay="200">
+                    {% for favorite in favorite_products %}
+                        <div class="col-md-4 mb-3">
+                            <div class="card">
+                                <div class="card-img-container">
+                                    <img 
+                                        src="{{ favorite.product.image.url }}" 
+                                        class="card-img-top" 
+                                        alt="{{ favorite.product.product_name }}"
+                                    >
+                                    <div class="card-img-overlay">
+                                        <a 
+                                            href="#" 
+                                            class="btn btn-danger remove-favorite"
+                                            onclick="event.preventDefault(); 
+                                            window.location.href='{% url 'toggle_favorite' favorite.product.id %}'"
+                                        >
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ favorite.product.product_name }}</h5>
+                                    <p class="card-text">
+                                        {{ favorite.product.desc|truncatewords:10 }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <p>No favorite products yet.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+/* Profile Card Styles (dari sebelumnya) */
+.profile-section .section-title {
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.profile-card {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+
+.profile-card-header {
+    position: relative;
+    height: 250px;
+}
+
+.profile-card-header .profile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-card-header .edit-profile-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background-color: rgba(220,53,69,0.8);
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.profile-card-header .edit-profile-btn:hover {
+    background-color: #dc3545;
+}
+
+.profile-card-body {
+    padding: 20px;
+    text-align: center;
+}
+
+.profile-card-body h3 {
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.profile-details {
+    text-align: left;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+.detail-item i {
+    margin-right: 10px;
+    color: #dc3545;
+    font-size: 1.2rem;
+}
+
+/* Product Card Styles */
+.card-img-container {
+    position: relative;
+    height: 250px; /* Fixed height to maintain consistent layout */
+    overflow: hidden;
+}
+
+.card-img-container .card-img-top {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures image covers entire container */
+}
+
+.card-img-container .card-img-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.card-img-container:hover .card-img-overlay {
+    opacity: 1;
+}
+
+.remove-favorite {
+    background-color: rgba(220,53,69,0.8);
+    border: none;
+}
+
+.remove-favorite:hover {
+    background-color: #dc3545;
+}
+
+.card {
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.profile-section {
+    background-color: #f8f9fa;
+}
+
+
+</style>
+{% endblock %}

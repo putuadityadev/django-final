@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'ecommerceapp',
     'authcart',
     'news',
+    'myprofile.apps.MyprofileConfig',
 ]
 
 MIDDLEWARE = [
