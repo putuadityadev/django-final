@@ -7,12 +7,10 @@ class AppleTechNewsForm(forms.ModelForm):
         fields = ['title', 'content', 'image']
         widgets = {
             'title': forms.TextInput(attrs={
-                'class': 'form-control', 
-                'placeholder': 'Tittle '
+                'placeholder': 'Enter news title'
             }),
             'content': forms.Textarea(attrs={
-                'class': 'form-control', 
-                'placeholder': 'Tulis detail berita disini...',
+                'placeholder': 'Write the detail here...',
                 'rows': 5
             })
         }
@@ -20,5 +18,5 @@ class AppleTechNewsForm(forms.ModelForm):
     def clean_title(self):
         title = self.cleaned_data['title']
         if len(title) < 10:
-            raise forms.ValidationError("Judul terlalu pendek")
+            raise forms.ValidationError("Title is too short")
         return title
