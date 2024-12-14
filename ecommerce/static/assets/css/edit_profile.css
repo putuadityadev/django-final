@@ -1,0 +1,160 @@
+.edit-profile .section-title {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.edit-profile .contact-form {
+  background: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.edit-profile .form-group {
+  margin-bottom: 15px;
+}
+
+.edit-profile .form-control {
+  border-radius: 10px;
+}
+
+.edit-profile .form-control:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+
+.edit-profile .btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+  border-radius: 10px;
+  padding: 10px 24px;
+}
+
+.edit-profile .btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Profile Picture Upload Styles */
+.profile-picture-upload-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+  cursor: pointer;
+}
+
+.profile-picture-upload-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 10;
+}
+
+.profile-picture-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.current-profile-picture {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-picture-hover-content {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.profile-picture-upload-container:hover .profile-picture-hover-content {
+  opacity: 1;
+}
+
+.image-preview-container {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+
+.image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.image-remove-btn {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 20;
+}
+.edit-profile .form-label {
+  color: #495057;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.edit-profile .text-danger {
+  color: #dc3545 !important;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+/* Styling untuk input error */
+.edit-profile .form-control.is-invalid,
+.edit-profile .form-select.is-invalid {
+  border-color: #dc3545;
+  background-image: none;
+}
+
+.edit-profile .form-control.is-invalid:focus,
+.edit-profile .form-select.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}
+.edit-profile .form-select {
+  border-radius: 10px;
+  border-color: #ced4da;
+  padding: 12px 15px;
+  transition: all 0.3s ease;
+  background-image: none; /* Hapus panah default */
+}
+
+.edit-profile .form-select:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+  outline: none;
+}
+
+.edit-profile .form-select.is-invalid {
+  border-color: #dc3545;
+  background-image: none;
+}
+
+.edit-profile .form-select.is-invalid:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 0.2rem rgba(220,53,69,0.25);
+}

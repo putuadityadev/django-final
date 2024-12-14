@@ -2492,3 +2492,12 @@ section,
 }
 
 
+/*new style */
+.navmenu a.active {
+  font-weight: bold;
+  border-bottom: 2px solid #DC3545;
+}
+
+.navmenu .dropdown a.active {
+  border-bottom: none;  
+}
