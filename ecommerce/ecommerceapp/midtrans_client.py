@@ -8,10 +8,8 @@ class MidtransClient:
         self.client_key = client_key
         self.is_production = is_production
         
-        # Base URL
         self.base_url = 'https://app.midtrans.com' if is_production else 'https://app.sandbox.midtrans.com'
         
-        # Encode server key
         self.auth_string = base64.b64encode(f'{server_key}:'.encode()).decode()
 
     def create_transaction(self, payload):

@@ -51,10 +51,8 @@ class ContactView(CreateView):
     success_url = reverse_lazy('contact')
 
     def form_valid(self, form):
-        # Simpan form dan dapatkan objek
         self.object = form.save()
         
-        # Tambahkan pesan
         messages.success(self.request, 'We will get back to you soon...')
         
         return super().form_valid(form)
@@ -72,28 +70,23 @@ class ProductView(TemplateView):
         min_price = self.request.GET.get('min_price', '')
         max_price = self.request.GET.get('max_price', '')
 
-        # Query dasar produk
         products = Product.objects.all()
 
-        # Filtering berdasarkan search
         if search_query:
             products = products.filter(
                 Q(product_name__icontains=search_query) | 
                 Q(desc__icontains=search_query)
             )
 
-        # Filtering berdasarkan kategori
         if category_filter:
             products = products.filter(category=category_filter)
 
-        # Filtering berdasarkan harga
         if min_price and max_price:
             try:
                 min_price = float(min_price)
                 max_price = float(max_price)
                 products = products.filter(price__range=(min_price, max_price))
             except ValueError:
-                # Jika konversi ke float gagal, abaikan filter harga
                 pass
         elif min_price:
             try:
@@ -108,7 +101,6 @@ class ProductView(TemplateView):
             except ValueError:
                 pass
 
-        # Sorting
         if sort_by == 'price_asc':
             products = products.order_by('price')
         elif sort_by == 'price_desc':
@@ -116,7 +108,6 @@ class ProductView(TemplateView):
         elif sort_by == 'newest':
             products = products.order_by('-id')
 
-        # Persiapkan data untuk template
         allProds = []
         catprods = products.values('category', 'id')
         cats = {item['category'] for item in catprods}
@@ -127,13 +118,10 @@ class ProductView(TemplateView):
             nSlides = n // 4 + ceil((n/4) - (n//4))
             allProds.append([prod, range(1, nSlides), nSlides])
         
-        # Tambahkan data ke context
         context['allProds'] = allProds
         
-        # Tambahkan daftar kategori untuk filter
         context['categories'] = list(set(Product.objects.values_list('category', flat=True)))
         
-        # Tambahkan parameter search untuk mempertahankan filter
         context['search_query'] = search_query
         context['selected_category'] = category_filter
         context['sort_by'] = sort_by
@@ -154,13 +142,11 @@ class CheckoutView(LoginRequiredMixin, CreateView):
 
     def post(self, request, *args, **kwargs):
         try:
-            # Debug print
             print("Received POST request")
             print("Request headers:", request.headers)
             print("Request POST data:", request.POST)
             print("Is AJAX:", request.headers.get('X-Requested-With') == 'XMLHttpRequest')
 
-            # Parsing items dari itemsJson
             items_json = json.loads(request.POST.get('itemsJson', '{}'))
             item_details = []
 
@@ -173,18 +159,15 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                     'name': name
                 })
 
-            # Modifikasi data untuk sesuaikan dengan nama field model
             post_data = request.POST.copy()
             post_data['items_json'] = post_data.get('itemsJson', '')
             post_data['amount'] = post_data.get('amt', '')
 
-            # Buat form baru dengan data yang sudah dimodifikasi
             form = self.get_form_class()(post_data)
             
             print("Form validation:", form.is_valid())
             
             if form.is_valid():
-                # Set user dan additional fields
                 form.instance.user = request.user
                 form.instance.oid = f"ORDER-{int(time.time())}"  # Generate unique order ID
                 form.instance.paymentstatus = 'PENDING'
@@ -192,17 +175,14 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                 # Simpan order
                 order = form.save()
                 
-                # Debug print order details
                 print(f"Order created: {order.order_id}")
                 print(f"Order amount: {order.amount}")
 
-                # Tambahkan logika OrderUpdate
                 update = OrderUpdate.objects.create(
                     order_id=order.order_id, 
                     update_desc="Order placed successfully"
                 )
 
-                # Generate Midtrans Token
                 try:
                     snap = midtransclient.Snap(
                         is_production=settings.MIDTRANS_IS_PRODUCTION,
@@ -210,7 +190,6 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                         client_key=settings.MIDTRANS_CLIENT_KEY
                     )
 
-                    # Payload transaksi dengan item details yang lebih detail
                     param = {
                         "transaction_details": {
                             "order_id": str(order.oid),
@@ -249,20 +228,15 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                         ]
                     }
 
-                    # Debug print payload
                     print("Midtrans Payload:", param)
 
-                    # Buat transaksi
                     transaction = snap.create_transaction(param)
                     
-                    # Debug print token
                     print("Midtrans Transaction Token:", transaction.get('token'))
 
-                    # Simpan token pembayaran
                     order.payment_token = transaction['token']
                     order.save()
 
-                    # Kembalikan response JSON
                     return JsonResponse({
                         'status': 'success',
                         'midtrans_token': transaction['token'],
@@ -270,11 +244,9 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                     })
 
                 except midtransclient.MidtransAPIError as midtrans_api_error:
-                    # Log error Midtrans API
                     print(f"Midtrans API Error: {midtrans_api_error}")
                     print(f"Error Response: {midtrans_api_error.raw_response}")
                     
-                    # Hapus order yang gagal
                     order.delete()
                     
                     return JsonResponse({
@@ -290,7 +262,6 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                     }, status=500)
 
             else:
-                # Jika form tidak valid
                 print("Form Errors:", form.errors)
                 return JsonResponse({
                     'status': 'error',
@@ -298,7 +269,6 @@ class CheckoutView(LoginRequiredMixin, CreateView):
                 }, status=400)
 
         except Exception as e:
-            # Tangani error umum
             logger.error(f"Unexpected Error: {e}")
             print(f"Unexpected Error: {e}")
             return JsonResponse({
@@ -320,23 +290,18 @@ class OrderSuccessView(TemplateView):
 @csrf_exempt
 def midtrans_payment_handler(request):
     try:
-        # Terima notification dari Midtrans
         notification_body = request.body.decode('utf-8')
         notification_dict = json.loads(notification_body)
         
-        # Validasi signature
         snap = midtransclient.Snap(
             is_production=settings.MIDTRANS_IS_PRODUCTION,
             server_key=settings.MIDTRANS_SERVER_KEY
         )
         
-        # Verifikasi status transaksi
         status = snap.transaction.notification(notification_dict)
         
-        # Ambil order
         order = Orders.objects.get(oid=status['order_id'])
         
-        # Update status pembayaran
         if status['transaction_status'] == 'capture':
             order.payment_status = 'PAID'
         elif status['transaction_status'] in ['deny', 'cancel', 'expire']:
@@ -344,7 +309,6 @@ def midtrans_payment_handler(request):
         
         order.save()
         
-        # Buat update order
         OrderUpdate.objects.create(
             order_id=order.order_id,
             update_desc=f"Payment status updated to {order.payment_status}"

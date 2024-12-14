@@ -49,7 +49,6 @@ class OrderUpdateAdmin(admin.ModelAdmin):
     search_fields = ('order_id', 'update_desc')
     list_editable = ('delivered',)
 
-# Kostumisasi admin site
 admin.site.site_header = 'Apple Tech E-Commerce Admin'
 admin.site.site_title = 'Apple Tech Admin Portal'
 admin.site.index_title = 'Welcome to Apple Tech Administration'

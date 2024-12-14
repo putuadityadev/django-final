@@ -9,7 +9,6 @@ from ecommerceapp.models import Product
 
 @login_required
 def editprofile(request):
-    # Pastikan profil selalu ada
     profile, created = Profile.objects.get_or_create(user=request.user)
 
     if request.method == 'POST':
@@ -52,18 +51,15 @@ def view_profile(request):
 def toggle_favorite(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
     
-    # Cek apakah produk sudah ada di favorit
     favorite, created = FavoriteProduct.objects.get_or_create(
         user=request.user, 
         product=product
     )
     
     if not created:
-        # Jika sudah ada, hapus dari favorit
         favorite.delete()
         messages.warning(request, f"{product.product_name} removed from favorites")
     else:
         messages.success(request, f"{product.product_name} added to favorites")
     
-    # Kembali ke halaman sebelumnya
     return redirect(request.META.get('HTTP_REFERER', 'product'))
