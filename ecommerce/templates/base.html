@@ -56,9 +56,10 @@
             <li><a href="/product" class="{% if '/product/' in request.path %}active{% endif %}">Product</a></li>
             <li><a href="/news" class="{% if '/news/' in request.path %}active{% endif %}">News</a></li>
             <li><a href="/contact" class="{% if '/contact/' in request.path %}active{% endif %}">Contact</a></li>
-            <li><a href="/profile" class="{% if '/profile/' in request.path %}active{% endif %}">My Profile</a></li>
+            
             
             {% if request.user.is_authenticated %}
+                <li><a href="/profile" class="{% if '/profile/' in request.path %}active{% endif %}">My Profile</a></li>
                 <li><a href="/auth/logout" class="{% if request.path == '/auth/logout' %}active{% endif %}">Logout</a></li>
             {% else %}
                 <li class="dropdown">
